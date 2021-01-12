@@ -1,0 +1,12 @@
+head_dir="/global/homes/b/boryanah/repos/abacus_lc_cat/all_headers"
+sim_names="sim_names.txt"
+script="headers.sh"
+sim_dir="/global/project/projectdirs/desi/cosmosim/Abacus/"
+echo -n "mkdir ${head_dir}; cd ${head_dir}" >> "$script"
+echo "" >> "$script"
+while IFS= read -r line; do
+    echo -n "mkdir ${line}; cd ${line}" >> "$script"
+    echo "" >> "$script"
+    echo -n "cp ${sim_dir}/${line}/lightcones/pid/headers.zip .; unzip headers.zip; rm headers.zip; cd .." >> "$script"
+    echo "" >> "$script"
+done < "$sim_names"

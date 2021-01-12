@@ -48,3 +48,45 @@ def dist(pos1, pos2, L=None):
         if not broadcast:
             i2 += 1
     return dist
+
+@nb.njit
+def wrapping(r1, r2, pos1, pos2, chi1, chi2, Lbox, origin):
+
+    # read dimension of data
+    N, nd = pos1.shape
+    assert pos1.shape == pos2.shape, "halo positions not of the same dimension"
+    assert origin.shape[-1] == nd, "different dimensions of the halo positions and observer's position"
+    
+    # loop over all halos
+    for i in range(N):
+        # pos1 fails the condition for selecting halos
+        if (r1[i] > chi1) | (r1[i] <= chi2):
+            delta = 0.
+            for j in range(nd):
+                dx = pos1[i][j] - pos2[i][j]
+                # halos on opposite sides of the box
+                if (dx > Lbox/2.) | (dx <= -Lbox/2.):
+                    if pos1[i][j] >= 0.:
+                        pos1[i][j] -= Lbox
+                    else:
+                        pos1[i][j] += Lbox
+                dist = pos1[i][j] - origin[j]
+                delta += dist*dist
+            r1[i] = np.sqrt(delta)
+                
+        # pos2 fails the condition for selecting halos
+        elif (r2[i] > chi1) | (r2[i] <= chi2):
+            delta = 0.
+            for j in range(nd):
+                dx = pos1[i][j] - pos2[i][j]
+                # halos on opposite sides of the box
+                if (dx > Lbox/2.) | (dx <= -Lbox/2.):
+                    if pos2[i][j] >= 0.:
+                        pos2[i][j] -= Lbox
+                    else:
+                        pos2[i][j] += Lbox
+                dist = pos2[i][j] - origin[j]
+                delta += dist*dist
+            r2[i] = np.sqrt(delta)
+
+    return r1, r2, pos1, pos2

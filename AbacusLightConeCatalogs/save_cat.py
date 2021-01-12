@@ -85,13 +85,14 @@ def main(sim_name, z_start, z_stop, compaso_parent, catalog_parent, merger_paren
     # directory where the merger tree files are kept
     merger_dir = merger_parent / sim_name
     
-    # more accurate, slightly slower
-    if not os.path.exists("data/zs_mt.npy"):
+    # if merger tree redshift information has been saved, load it (if not, save it)
+    if not os.path.exists(Path("data_mt") / sim_name / "zs_mt.npy"):
         # all merger tree snapshots and corresponding redshifts
         snaps_mt = sorted(merger_dir.glob("associations_z*.0.asdf"))
         zs_mt = get_zs_from_headers(snaps_mt)
-        np.save("data/zs_mt.npy", zs_mt)
-    zs_mt = np.load("data/zs_mt.npy")
+        os.makedirs(Path("data_mt") / sim_name, exist_ok=True)
+        np.save(Path("data_mt") / sim_name / "zs_mt.npy", zs_mt)
+    zs_mt = np.load(Path("data_mt") / sim_name / "zs_mt.npy")
 
     # names of the merger tree file for a given redshift
     merger_fns = list(merger_dir.glob("associations_z%4.3f.*.asdf"%zs_mt[0]))
@@ -102,12 +103,13 @@ def main(sim_name, z_start, z_stop, compaso_parent, catalog_parent, merger_paren
     
     # all redshifts, steps and comoving distances of light cones files; high z to low z
     # remove presaving after testing done (or make sure presaved can be matched with simulation)
-    if not os.path.exists("data_headers/coord_dist.npy") or not os.path.exists("data_headers/redshifts.npy"):
+    if not os.path.exists(Path("data_headers") / sim_name / "coord_dist.npy") or not os.path.exists(Path("data_headers") / sim_name / "redshifts.npy"):
         zs_all, steps, chis_all = get_lc_info("all_headers")
-        np.save("data_headers/redshifts.npy", zs_all)
-        np.save("data_headers/coord_dist.npy", chis_all)
-    zs_all = np.load("data_headers/redshifts.npy")
-    chis_all = np.load("data_headers/coord_dist.npy")
+        os.makedirs(Path("data_headers") / sim_name, exist_ok=True)
+        np.save(Path("data_headers") / sim_name / "redshifts.npy", zs_all)
+        np.save(Path("data_headers") / sim_name / "coord_dist.npy", chis_all)
+    zs_all = np.load(Path("data_headers") / sim_name / "redshifts.npy")
+    chis_all = np.load(Path("data_headers") / sim_name / "coord_dist.npy")
     zs_all[-1] = float("%.1f" % zs_all[-1])  # LHG: I guess this is trying to match up to some filename or something?
 
     # get functions relating chi and z
