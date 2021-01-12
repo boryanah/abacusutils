@@ -247,7 +247,7 @@ def main(sim_name, z_start, z_stop, merger_parent, catalog_parent, resume=False,
     # redshift of closest point on wall between original and copied box
     z1 = z_of_chi(0.5 * Lbox - origins[0][0])
     # redshift of closest point where all three boxes touch
-    z2 = z_of_chi((0.5*Lbox-origin[0])*np.sqrt(2))
+    z2 = z_of_chi((0.5*Lbox-origins[0][0])*np.sqrt(2))
     # furthest point where all three boxes touch;
     z3 = z_of_chi((0.5 * Lbox - origins[0][0]) * np.sqrt(3))
 
